@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 import { Component } from 'react';
 import { connect } from 'react-redux';
 import { addEmail, addName } from '../redux/actions/index';
+import apiToken from '../services/Api';
 
 class Login extends Component {
   state = {
@@ -31,12 +32,22 @@ class Login extends Component {
     }
   };
 
-  redirectWallet = () => {
-    const { dispatch } = this.props;
+  redirectWallet = async () => {
+    const { dispatch, history } = this.props;
     const { email, name } = this.state;
     dispatch(addEmail(email));
     dispatch(addName(name));
+    const getToken = await apiToken();
+    localStorage.setItem('token', getToken);
+    history.push('/game');
   };
+
+  // handleChangeButton = async () => {
+  //   const { history } = this.props;
+  //   const getToken = await apiToken();
+  //   localStorage.setItem('token', getToken);
+  //   history.push('/game');
+  // };
 
   render() {
     const { email, name, validated } = this.state;
