@@ -1,6 +1,6 @@
 const INITIAL_STATE = {
   name: '',
-  email: '',
+  gravatarEmail: '',
 };
 
 const playerReducer = (state = INITIAL_STATE, action) => {
@@ -8,7 +8,7 @@ const playerReducer = (state = INITIAL_STATE, action) => {
   case 'EMAIL':
     return {
       ...state,
-      email: action.payload,
+      gravatarEmail: action.payload,
     };
   case 'NAME':
     return {

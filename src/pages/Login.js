@@ -3,6 +3,8 @@ import { Component } from 'react';
 import { connect } from 'react-redux';
 import { addEmail, addName } from '../redux/actions/index';
 import apiToken from '../services/Api';
+import logo from '../images/trivia.png';
+import icone from '../images/icone.png';
 
 class Login extends Component {
   state = {
@@ -32,7 +34,7 @@ class Login extends Component {
     }
   };
 
-  redirectWallet = async () => {
+  redirectGame = async () => {
     const { dispatch, history } = this.props;
     const { email, name } = this.state;
     dispatch(addEmail(email));
@@ -41,13 +43,6 @@ class Login extends Component {
     localStorage.setItem('token', getToken);
     history.push('/game');
   };
-
-  // handleChangeButton = async () => {
-  //   const { history } = this.props;
-  //   const getToken = await apiToken();
-  //   localStorage.setItem('token', getToken);
-  //   history.push('/game');
-  // };
 
   redirectSettings = () => {
     const { history } = this.props;
@@ -58,38 +53,47 @@ class Login extends Component {
     const { email, name, validated } = this.state;
     return (
       <div className="container">
-        <input
-          className="email"
-          type="email"
-          name="email"
-          value={ email }
-          data-testid="input-gravatar-email"
-          onChange={ this.handleChange }
-        />
-        <input
-          className="name"
-          type="text"
-          name="name"
-          value={ name }
-          data-testid="input-player-name"
-          onChange={ this.handleChange }
-        />
-        <button
-          data-testid="btn-play"
-          type="button"
-          className="play"
-          disabled={ validated }
-          onClick={ this.redirectWallet }
-        >
-          Play
-        </button>
-        <button
-          onClick={ this.redirectSettings }
-          type="button"
-          data-testid="btn-settings"
-        >
-          Settings
-        </button>
+        <img className="logo" src={ logo } alt="logo" />
+        <form className="form">
+          <section className="login">
+            <input
+              placeholder="Qual é o seu e-mail do gravatar?"
+              className="email"
+              type="email"
+              name="email"
+              value={ email }
+              data-testid="input-gravatar-email"
+              onChange={ this.handleChange }
+            />
+            <input
+              placeholder="Qual é o seu nome"
+              className="name"
+              type="text"
+              name="name"
+              value={ name }
+              data-testid="input-player-name"
+              onChange={ this.handleChange }
+            />
+          </section>
+          <button
+            data-testid="btn-play"
+            type="button"
+            className="play"
+            disabled={ validated }
+            onClick={ this.redirectGame }
+          >
+            Play
+          </button>
+          <button
+            onClick={ this.redirectSettings }
+            type="button"
+            data-testid="btn-settings"
+            className="settings"
+          >
+            Settings
+          </button>
+        </form>
+        <img src={ icone } alt="icone" className="icone" />
       </div>
     );
   }
