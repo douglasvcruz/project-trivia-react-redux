@@ -2,7 +2,7 @@ const INITIAL_STATE = {
   name: '',
   gravatarEmail: '',
   score: 0,
-  assertions: '',
+  assertions: 0,
 };
 
 const playerReducer = (state = INITIAL_STATE, action) => {
