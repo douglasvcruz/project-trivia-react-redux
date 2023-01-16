@@ -3,14 +3,47 @@ import { Component } from 'react';
 import { connect } from 'react-redux';
 
 class Feedback extends Component {
+  // state = {
+  //   message: '',
+  // };
+
+  // componentDidMount() {
+  //   const { assertions } = this.props;
+  //   this.feedbackMessage(assertions);
+  // }
+
+  // feedbackMessage = (assert) => {
+  //   const minAssert = 3;
+  //   const message = (assert < minAssert) ? ('Could be better...') : ('Well Done!');
+  //   this.setState({
+  //     message,
+  //   });
+  // };
+
   render() {
-    const { history, score, name } = this.props;
+    // const { message } = this.state;
+    const minAssert = 3;
+    const { history, score, name, assertions } = this.props;
     const gravatar = localStorage.getItem('picture');
     return (
       <>
         <img data-testid="header-profile-picture" src={ gravatar } alt="gravatar" />
         <p data-testid="header-player-name">{name}</p>
         <p data-testid="header-score">{score}</p>
+        <h3>Feedback</h3>
+        <p data-testid="feedback-total-question">
+          { `Total de acertos: ${assertions}` }
+        </p>
+        <p data-testid="feedback-total-score">
+          { `Pontuação final: ${score}` }
+        </p>
+        <p
+          data-testid="feedback-text"
+        >
+          {
+            (assertions < minAssert) ? ('Could be better...') : ('Well Done!')
+          }
+        </p>
         <button
           data-testid="btn-play-again"
           type="button"
@@ -36,11 +69,13 @@ Feedback.propTypes = {
   }).isRequired,
   name: PropTypes.any,
   score: PropTypes.any,
+  assertions: PropTypes.any,
 }.isRequired;
 
 const mapStateToProps = (state) => ({
   name: state.player.name,
   score: state.player.score,
+  assertions: state.player.assertions,
 });
 
 export default connect(mapStateToProps)(Feedback);
