@@ -1,19 +1,20 @@
 import { Component } from 'react';
 import { connect } from 'react-redux';
-import md5 from 'crypto-js/md5';
+// import md5 from 'crypto-js/md5';
 import PropTypes from 'prop-types';
 import logo from '../images/trivia.png';
 import certo from '../images/right.png';
 import errado from '../images/wrong.png';
 import initial from '../images/inicial.png';
 import icone from '../images/icone.png';
-import settings from '../images/settings.png';
-import star from '../images/star.png';
+import Header from '../components/Header';
+// import settings from '../images/settings.png';
+// import star from '../images/star.png';
 
-export class Header extends Component {
+class Game extends Component {
   state = {
-    url: '',
-    score: 0,
+    // url: '',
+    // score: 0,
     proxima: 0,
     result: [],
     wrong: '',
@@ -22,7 +23,7 @@ export class Header extends Component {
   };
 
   componentDidMount() {
-    this.getPicture();
+    // this.getPicture();
     this.fetchApi();
   }
 
@@ -68,17 +69,17 @@ export class Header extends Component {
     });
   };
 
-  getPicture = () => {
-    const { email } = this.props;
-    const hash = md5(email).toString();
-    this.setState({
-      url: hash,
-    });
-  };
+  // getPicture = () => {
+  //   const { email } = this.props;
+  //   const hash = md5(email).toString();
+  //   this.setState({
+  //     url: hash,
+  //   });
+  // };
 
   render() {
-    const { result, proxima, wrong, right, change, url, score } = this.state;
-    const { name } = this.props;
+    const { result, proxima, wrong, right, change } = this.state;
+    // const { name } = this.props;
     if (result.length === 0) {
       return false;
     }
@@ -95,7 +96,7 @@ export class Header extends Component {
     }
     return (
       <div>
-        <header>
+        {/* <header>
           <img
             className="gravatar"
             data-testid="header-profile-picture"
@@ -106,7 +107,8 @@ export class Header extends Component {
           <img src={ star } alt="star" className="star" />
           <p className="score" data-testid="header-score">{`Pontos: ${score}`}</p>
           <img src={ settings } alt="settings" className="header-settings" />
-        </header>
+        </header> */}
+        <Header />
         <main className="container-question">
           <img src={ logo } alt="logo" className="logo-questions" />
           <div className="div-questions">
@@ -172,17 +174,18 @@ export class Header extends Component {
   }
 }
 
-Header.propTypes = {
-  email: PropTypes.string.isRequired,
+Game.propTypes = {
+  // email: PropTypes.string.isRequired,
   history: PropTypes.shape({
     push: PropTypes.func.isRequired,
   }).isRequired,
-  name: PropTypes.string.isRequired,
+  // name: PropTypes.string.isRequired,
 };
 
 const mapStateToProps = (state) => ({
-  name: state.player.name,
-  email: state.player.gravatarEmail,
+  state,
+  // name: state.player.name,
+  // email: state.player.gravatarEmail,
 });
 
-export default connect(mapStateToProps)(Header);
+export default connect(mapStateToProps)(Game);
