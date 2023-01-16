@@ -1,31 +1,52 @@
 import { Component } from 'react';
-import { connect } from 'react-redux';
-// import md5 from 'crypto-js/md5';
+import md5 from 'crypto-js/md5';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import logo from '../images/trivia.png';
 import certo from '../images/right.png';
 import errado from '../images/wrong.png';
 import initial from '../images/inicial.png';
 import icone from '../images/icone.png';
 import Header from '../components/Header';
-// import settings from '../images/settings.png';
-// import star from '../images/star.png';
+
+const number = 30000;
+const numberInterval = 1000;
 
 class Game extends Component {
   state = {
-    // url: '',
-    // score: 0,
     proxima: 0,
     result: [],
     wrong: '',
     right: '',
     change: true,
+    seconds: 30,
+    question: '',
+    category: '',
+    correct: '',
   };
 
   componentDidMount() {
-    // this.getPicture();
     this.fetchApi();
+    this.getPicture();
+    setTimeout(this.timer, number);
+    setInterval(this.timerInterval, numberInterval);
   }
+
+  timer = () => {
+    this.setState({
+      change: false,
+    });
+  };
+
+  timerInterval = () => {
+    const { seconds } = this.state;
+    if (seconds === 0) {
+      return false;
+    }
+    this.setState((prevState) => ({
+      seconds: prevState.seconds - 1,
+    }));
+  };
 
   fetchApi = async () => {
     const { history } = this.props;
@@ -37,53 +58,16 @@ class Game extends Component {
       localStorage.removeItem('token');
       history.push('/');
     }
-    this.setState({
-      result: data.results,
-    });
-  };
-
-  nextQuestion = () => {
-    const { proxima } = this.state;
-    const magicNumber = 4;
-    if (proxima === magicNumber) {
+    const { result } = this.state;
+    if (!result.length) {
       this.setState({
-        proxima: 0,
-      });
-    } else {
-      this.setState((prevState) => ({
-        proxima: prevState.proxima + 1,
-      }));
+        result: data.results,
+      }, this.questionRandom);
     }
-    this.setState({
-      wrong: '',
-      right: '',
-      change: true,
-    });
   };
 
-  changeColor = () => {
-    this.setState({
-      wrong: 'incorrect',
-      right: 'correct',
-      change: false,
-    });
-  };
-
-  // getPicture = () => {
-  //   const { email } = this.props;
-  //   const hash = md5(email).toString();
-  //   this.setState({
-  //     url: hash,
-  //   });
-  // };
-
-  render() {
-    const { result, proxima, wrong, right, change } = this.state;
-    // const { name } = this.props;
-    if (result.length === 0) {
-      return false;
-    }
-
+  questionRandom = () => {
+    const { proxima, result } = this.state;
     const incorrectAndCorrect = [...result[proxima]
       .incorrect_answers, result[proxima].correct_answer];
 
@@ -94,80 +78,136 @@ class Game extends Component {
       [incorrectAndCorrect[i], incorrectAndCorrect[j]] = [incorrectAndCorrect[j],
         incorrectAndCorrect[i]];
     }
+
+    const { category, correct_answer: correct, question } = result[proxima];
+
+    this.setState({
+      incorrectAndCorrect,
+      correct,
+      category,
+      question,
+    });
+  };
+
+  nextQuestion = () => {
+    const { proxima } = this.state;
+    const { history } = this.props;
+    const magicNumber = 4;
+    if (proxima === magicNumber) {
+      history.push('/feedback');
+    } else {
+      this.setState((prevState) => ({
+        proxima: prevState.proxima + 1,
+      }), this.questionRandom);
+    }
+    this.setState({
+      wrong: '',
+      right: '',
+      change: true,
+      seconds: 30,
+    });
+    setTimeout(this.timer, number);
+  };
+
+  changeColor = () => {
+    this.setState({
+      wrong: 'incorrect',
+      right: 'correct',
+      change: false,
+    });
+  };
+
+  getPicture = () => {
+    const { email } = this.props;
+    const hash = md5(email).toString();
+    this.setState({
+      url: hash,
+    });
+  };
+
+  render() {
+    const {
+      wrong,
+      right,
+      change,
+      seconds,
+      incorrectAndCorrect,
+      question,
+      category,
+      correct,
+      url,
+    } = this.state;
+    const { history, score, name } = this.props;
+
     return (
-      <div>
-        {/* <header>
-          <img
-            className="gravatar"
-            data-testid="header-profile-picture"
-            alt="profile"
-            src={ `https://www.gravatar.com/avatar/${url}` }
-          />
-          <p className="name-header" data-testid="header-player-name">{name}</p>
-          <img src={ star } alt="star" className="star" />
-          <p className="score" data-testid="header-score">{`Pontos: ${score}`}</p>
-          <img src={ settings } alt="settings" className="header-settings" />
-        </header> */}
-        <Header />
-        <main className="container-question">
-          <img src={ logo } alt="logo" className="logo-questions" />
-          <div className="div-questions">
+      <div className="container-div">
+        <Header
+          url={ url }
+          name={ name }
+          score={ score }
+          settingsHistory={ () => history.push('/settings') }
+        />
+        <div className="div-questions">
+          <div className="imgs">
+            <img src={ logo } alt="logo" className="logo-questions" />
             <section className="questions">
               <p
                 className="category"
                 data-testid="question-category"
               >
-                {result[proxima].category}
+                {category}
               </p>
               <p
                 className="question"
                 data-testid="question-text"
               >
-                {result[proxima].question}
+                {question}
               </p>
+              <p className="timer">{`Tempo: ${seconds}s`}</p>
             </section>
-            <section className="answers" data-testid="answer-options">
-              {incorrectAndCorrect
-                .map((a, i) => (
-                  <button
-                    className={ `pre-answers ${a === result[proxima].correct_answer
-                      ? right : wrong}` }
-                    onClick={ this.changeColor }
-                    data-testid={ a === result[proxima].correct_answer ? 'correct-answer'
-                      : `wrong-answer-${i}` }
-                    type="button"
-                    key={ i }
-                  >
-                    { !change ? (
-                      <img
-                        src={ a === result[proxima].correct_answer ? certo : errado }
-                        alt={ a === result[proxima].correct_answer ? 'right' : 'wrong' }
-                        className="img-answer"
-                      />
-                    ) : (
-                      <img
-                        src={ initial }
-                        alt="initial"
-                        className="img-answer"
-                      />
-                    )}
-                    <p className="frase">{a}</p>
-                  </button>
-                ))}
-              { !change && (
-                <button
-                  type="button"
-                  data-testid="btn-next"
-                  onClick={ this.nextQuestion }
-                  className="next"
-                >
-                  Next
-                </button>
-              )}
-            </section>
+            <img src={ icone } alt="icone" className="icone-questions" />
           </div>
-          <img src={ icone } alt="icone" className="icone-questions" />
-        </main>
+          <section className="answers" data-testid="answer-options">
+            { incorrectAndCorrect && incorrectAndCorrect
+              .map((a, i) => (
+                <button
+                  disabled={ !change }
+                  className={ `pre-answers ${a === correct
+                    ? right : wrong}` }
+                  onClick={ this.changeColor }
+                  data-testid={ a === correct ? 'correct-answer'
+                    : `wrong-answer-${i}` }
+                  type="button"
+                  key={ i }
+                >
+                  { !change ? (
+                    <img
+                      src={ a === correct ? certo : errado }
+                      alt={ a === correct ? 'right' : 'wrong' }
+                      className="img-answer"
+                    />
+                  ) : (
+                    <img
+                      src={ initial }
+                      alt="initial"
+                      className="img-answer"
+                    />
+                  )}
+                  <p className="frase">{a}</p>
+                </button>
+              ))}
+            { !change && (
+              <button
+                type="button"
+                data-testid="btn-next"
+                onClick={ this.nextQuestion }
+                className="next"
+              >
+                Next
+              </button>
+            )}
+          </section>
+        </div>
         <footer />
       </div>
     );
@@ -175,17 +215,18 @@ class Game extends Component {
 }
 
 Game.propTypes = {
-  // email: PropTypes.string.isRequired,
+  email: PropTypes.any,
   history: PropTypes.shape({
     push: PropTypes.func.isRequired,
   }).isRequired,
-  // name: PropTypes.string.isRequired,
-};
+  name: PropTypes.any,
+  score: PropTypes.any,
+}.isRequired;
 
 const mapStateToProps = (state) => ({
-  state,
-  // name: state.player.name,
-  // email: state.player.gravatarEmail,
+  name: state.player.name,
+  email: state.player.gravatarEmail,
+  score: state.player.score,
 });
 
 export default connect(mapStateToProps)(Game);

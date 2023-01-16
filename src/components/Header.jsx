@@ -1,55 +1,31 @@
-import md5 from 'crypto-js/md5';
 import PropTypes from 'prop-types';
-import React from 'react';
+import { Component } from 'react';
 import { connect } from 'react-redux';
+import star from '../images/star.png';
+import settings from '../images/settings.png';
 
-class Header extends React.Component {
-  state = {
-    img: '',
-  };
-
-  componentDidMount() {
-    this.setState({
-      img: this.gravatarImg(),
-    });
-  }
-
-  gravatarImg = () => {
-    const { gravatarEmail } = this.props;
-    const hash = md5(gravatarEmail).toString();
-    return `https://www.gravatar.com/avatar/${hash}`;
-  };
-
+class Header extends Component {
   render() {
-    const { img } = this.state;
-    const { name, score } = this.props;
+    const { name, score, settingsHistory, url } = this.props;
     return (
       <header>
-        <section>
+        <img
+          className="gravatar"
+          data-testid="header-profile-picture"
+          alt="profile"
+          src={ `https://www.gravatar.com/avatar/${url}` }
+        />
+        <p className="name-header" data-testid="header-player-name">{name}</p>
+        <img src={ star } alt="star" className="star" />
+        <p>Pontos:</p>
+        <p className="score" data-testid="header-score">{score}</p>
+        <button className="settings-button" type="button" onClick={ settingsHistory }>
           <img
-            data-testid="header-profile-picture"
-            src={ img }
-            alt=""
+            src={ settings }
+            alt="settings"
+            className="header-settings"
           />
-          <h3
-            data-testid="header-player-name"
-          >
-            {name}
-
-          </h3>
-        </section>
-        <section>
-          <h3
-            className="score"
-          >
-            Pontos:
-          </h3>
-          <h3
-            data-testid="header-score"
-          >
-            {score}
-          </h3>
-        </section>
+        </button>
       </header>
     );
   }
@@ -61,10 +37,10 @@ Header.propTypes = {
   score: PropTypes.any,
 }.isRequired;
 
-const mapStateToProps = (store) => ({
-  gravatarEmail: store.player.gravatarEmail,
-  name: store.player.name,
-  score: store.player.score,
+const mapStateToProps = (state) => ({
+  gravatarEmail: state.player.gravatarEmail,
+  name: state.player.name,
+  score: state.player.score,
 });
 
 export default connect(mapStateToProps)(Header);
