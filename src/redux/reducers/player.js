@@ -17,6 +17,11 @@ const playerReducer = (state = INITIAL_STATE, action) => {
       ...state,
       name: action.payload,
     };
+  case 'ASSERTIONS':
+    return {
+      ...state,
+      assertions: state.assertions + action.payload,
+    };
   default:
     return state;
   }

@@ -8,8 +8,9 @@ import errado from '../images/wrong.png';
 import initial from '../images/inicial.png';
 import icone from '../images/icone.png';
 import Header from '../components/Header';
+import { addAssertions } from '../redux/actions';
 
-const number = 30000;
+const number = 30100;
 const numberInterval = 1000;
 
 class Game extends Component {
@@ -33,9 +34,12 @@ class Game extends Component {
   }
 
   timer = () => {
-    this.setState({
-      change: false,
-    });
+    const { seconds } = this.state;
+    if (seconds === 0) {
+      this.setState({
+        change: false,
+      });
+    }
   };
 
   timerInterval = () => {
@@ -109,12 +113,19 @@ class Game extends Component {
     setTimeout(this.timer, number);
   };
 
-  changeColor = () => {
+  changeColor = (event) => {
     this.setState({
       wrong: 'incorrect',
       right: 'correct',
       change: false,
     });
+
+    const { correct } = this.state;
+    const { dispatch } = this.props;
+
+    if (event.target.innerText === correct) {
+      dispatch((addAssertions(1)));
+    }
   };
 
   getPicture = () => {

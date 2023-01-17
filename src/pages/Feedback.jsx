@@ -3,28 +3,11 @@ import { Component } from 'react';
 import { connect } from 'react-redux';
 
 class Feedback extends Component {
-  // state = {
-  //   message: '',
-  // };
-
-  // componentDidMount() {
-  //   const { assertions } = this.props;
-  //   this.feedbackMessage(assertions);
-  // }
-
-  // feedbackMessage = (assert) => {
-  //   const minAssert = 3;
-  //   const message = (assert < minAssert) ? ('Could be better...') : ('Well Done!');
-  //   this.setState({
-  //     message,
-  //   });
-  // };
-
   render() {
-    // const { message } = this.state;
     const minAssert = 3;
     const { history, score, name, assertions } = this.props;
     const gravatar = localStorage.getItem('picture');
+
     return (
       <>
         <img data-testid="header-profile-picture" src={ gravatar } alt="gravatar" />
