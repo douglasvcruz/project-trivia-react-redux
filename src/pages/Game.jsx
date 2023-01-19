@@ -8,7 +8,7 @@ import errado from '../images/wrong.png';
 import initial from '../images/inicial.png';
 import icone from '../images/icone.png';
 import Header from '../components/Header';
-import { addAssertions } from '../redux/actions';
+import { addAssertions, addScore } from '../redux/actions';
 
 const number = 30100;
 const numberInterval = 1000;
@@ -76,9 +76,7 @@ class Game extends Component {
       .incorrect_answers, result[proxima].correct_answer];
 
     for (let i = 0; i < incorrectAndCorrect.length; i += 1) {
-      const j = Math
-        .floor(Math
-          .random() * (incorrectAndCorrect.length));
+      const j = Math.floor(Math.random() * (incorrectAndCorrect.length));
       [incorrectAndCorrect[i], incorrectAndCorrect[j]] = [incorrectAndCorrect[j],
         incorrectAndCorrect[i]];
     }
@@ -120,11 +118,19 @@ class Game extends Component {
       change: false,
     });
 
-    const { correct } = this.state;
+    const { correct, seconds, result, proxima } = this.state;
     const { dispatch } = this.props;
+    const three = 3; const two = 2; const one = 1; const ten = 10;
 
     if (event.target.innerText === correct) {
-      dispatch((addAssertions(1)));
+      dispatch(addAssertions(1));
+      if (result[proxima].difficulty === 'hard') {
+        dispatch(addScore(ten + (seconds * three)));
+      } else if (result[proxima].difficulty === 'medium') {
+        dispatch(addScore(ten + (seconds * two)));
+      } else {
+        dispatch(addScore(ten + (seconds * one)));
+      }
     }
   };
 
