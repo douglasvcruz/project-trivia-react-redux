@@ -12,3 +12,8 @@ export const addAssertions = (assertions) => ({
   type: 'ASSERTIONS',
   payload: assertions,
 });
+
+export const addScore = (score) => ({
+  type: 'SCORE',
+  payload: score,
+});

@@ -8,7 +8,7 @@ import errado from '../images/wrong.png';
 import initial from '../images/inicial.png';
 import icone from '../images/icone.png';
 import Header from '../components/Header';
-import { addAssertions } from '../redux/actions';
+import { addAssertions, addScore } from '../redux/actions';
 
 const number = 30100;
 const numberInterval = 1000;
@@ -24,6 +24,7 @@ class Game extends Component {
     question: '',
     category: '',
     correct: '',
+    url: '',
   };
 
   componentDidMount() {
@@ -76,9 +77,7 @@ class Game extends Component {
       .incorrect_answers, result[proxima].correct_answer];
 
     for (let i = 0; i < incorrectAndCorrect.length; i += 1) {
-      const j = Math
-        .floor(Math
-          .random() * (incorrectAndCorrect.length));
+      const j = Math.floor(Math.random() * (incorrectAndCorrect.length));
       [incorrectAndCorrect[i], incorrectAndCorrect[j]] = [incorrectAndCorrect[j],
         incorrectAndCorrect[i]];
     }
@@ -94,10 +93,16 @@ class Game extends Component {
   };
 
   nextQuestion = () => {
-    const { proxima } = this.state;
-    const { history } = this.props;
+    const { proxima, url } = this.state;
+    const { history, score, name } = this.props;
     const magicNumber = 4;
+    const local = JSON.parse(localStorage.getItem('ranking'));
     if (proxima === magicNumber) {
+      if (local) {
+        localStorage.setItem('ranking', JSON.stringify([...local, { name, score, url }]));
+      } else {
+        localStorage.setItem('ranking', JSON.stringify([{ name, score, url }]));
+      }
       history.push('/feedback');
     } else {
       this.setState((prevState) => ({
@@ -120,11 +125,19 @@ class Game extends Component {
       change: false,
     });
 
-    const { correct } = this.state;
+    const { correct, seconds, result, proxima } = this.state;
     const { dispatch } = this.props;
+    const three = 3; const two = 2; const one = 1; const ten = 10;
 
     if (event.target.innerText === correct) {
-      dispatch((addAssertions(1)));
+      dispatch(addAssertions(1));
+      if (result[proxima].difficulty === 'hard') {
+        dispatch(addScore(ten + (seconds * three)));
+      } else if (result[proxima].difficulty === 'medium') {
+        dispatch(addScore(ten + (seconds * two)));
+      } else {
+        dispatch(addScore(ten + (seconds * one)));
+      }
     }
   };
 
@@ -138,15 +151,11 @@ class Game extends Component {
 
   render() {
     const {
-      wrong,
-      right,
-      change,
-      seconds,
+      wrong, right,
+      change, seconds,
       incorrectAndCorrect,
-      question,
-      category,
-      correct,
-      url,
+      question, category,
+      correct, url,
     } = this.state;
     const { history, score, name } = this.props;
 
@@ -179,34 +188,31 @@ class Game extends Component {
             <img src={ icone } alt="icone" className="icone-questions" />
           </div>
           <section className="answers" data-testid="answer-options">
-            { incorrectAndCorrect && incorrectAndCorrect
-              .map((a, i) => (
-                <button
-                  disabled={ !change }
-                  className={ `pre-answers ${a === correct
-                    ? right : wrong}` }
-                  onClick={ this.changeColor }
-                  data-testid={ a === correct ? 'correct-answer'
-                    : `wrong-answer-${i}` }
-                  type="button"
-                  key={ i }
-                >
-                  { !change ? (
-                    <img
-                      src={ a === correct ? certo : errado }
-                      alt={ a === correct ? 'right' : 'wrong' }
-                      className="img-answer"
-                    />
-                  ) : (
-                    <img
-                      src={ initial }
-                      alt="initial"
-                      className="img-answer"
-                    />
-                  )}
-                  <p className="frase">{a}</p>
-                </button>
-              ))}
+            { incorrectAndCorrect && incorrectAndCorrect.map((a, i) => (
+              <button
+                disabled={ !change }
+                className={ `pre-answers ${a === correct
+                  ? right : wrong}` }
+                onClick={ this.changeColor }
+                data-testid={ a === correct ? 'correct-answer'
+                  : `wrong-answer-${i}` }
+                type="button"
+                key={ i }
+              >
+                { !change ? (
+                  <img
+                    src={ a === correct ? certo : errado }
+                    alt={ a === correct ? 'right' : 'wrong' }
+                    className="img-answer"
+                  />
+                ) : (
+                  <img
+                    src={ initial }
+                    alt="initial"
+                    className="img-answer"
+                  />)}
+                <p className="frase">{a}</p>
+              </button>))}
             { !change && (
               <button
                 type="button"
@@ -215,8 +221,7 @@ class Game extends Component {
                 className="next"
               >
                 Next
-              </button>
-            )}
+              </button>)}
           </section>
         </div>
         <footer />
