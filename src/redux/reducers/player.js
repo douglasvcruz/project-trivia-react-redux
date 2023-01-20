@@ -11,6 +11,8 @@ const playerReducer = (state = INITIAL_STATE, action) => {
     return {
       ...state,
       gravatarEmail: action.payload,
+      score: 0,
+      assertions: 0,
     };
   case 'NAME':
     return {
