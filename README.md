@@ -7,6 +7,7 @@ Foi desenvolvido um jogo de perguntas e respostas baseado no jogo Trivia (pareci
 <details>
   <summary>💻 Tecnologias utilizadas</summary>
 <br>
+  
 - React
 - Redux
 - JavaScript
